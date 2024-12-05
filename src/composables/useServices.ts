@@ -1,42 +1,59 @@
-import { ref, onBeforeMount } from 'vue'
+import { ref } from 'vue'
 import axios from 'axios'
+import type { IService } from '@/types/IService'
 
 // This composable is a simplified example for the exercise **and could likely be improved**.
 // Feel free to leave as-is, modify, or remove this file (and any others) as desired.
 // https://vuejs.org/guide/reusability/composables.html
 
-export default function useServices(): any {
-  const services = ref<any[]>([])
+export default function useServices() {
   const loading = ref<any>(false)
   const error = ref<any>(false)
 
-  const getServices = async (): Promise<any> => {
+  const fetchServices = async (searchQuery: string = ''): Promise<{
+    success: boolean
+    data: IService[]
+  }> => {
     try {
-      // Initialize loading state
       loading.value = true
 
-      // Fetch data from the API
-      const { data } = await axios.get('/api/services')
+      const { data } = await axios.get('/api/services', {
+        params: {
+          q: searchQuery,
+        },
+      })
 
-      // Store data in Vue ref
-      services.value = data
+      return {
+        success: true,
+        data,
+      }
     } catch (err: any) {
       error.value = true
+
+      return {
+        success: false,
+        data: [],
+      }
     } finally {
-      // Reset loading state
       loading.value = false
     }
   }
 
-  onBeforeMount(async (): Promise<void> => {
-    // Fetch services from the API
-    await getServices()
-  })
+  function getServiceStatus(service: IService) {
+    if (service.configured) {
+      if (service.published) {
+        return 'published'
+      }
+      return 'unpublished'
+    }
 
-  // Return stateful data
+    return 'in-progress'
+  }
+
   return {
-    services,
     loading,
     error,
+    fetchServices,
+    getServiceStatus,
   }
 }

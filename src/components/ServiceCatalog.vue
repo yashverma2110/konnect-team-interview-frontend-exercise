@@ -1,27 +1,89 @@
 <template>
   <div class="service-catalog">
-    <h1>Service Catalog</h1>
-    <input
-      v-model="searchQuery"
-      class="search-input"
-      data-testid="search-input"
-      placeholder="Search services"
-    >
+    <div class="service-catalog__header">
+      <BaseTypography
+        size="xl"
+        tag="h1"
+        weight="bold"
+      >
+        Service Hub
+      </BaseTypography>
+      <div class="service-catalog__header-actions">
+        <BaseDropdown
+          :options="sortByOptions"
+          size="sm"
+          title="Sort By"
+          @select="handleSortBySelection"
+        />
+        <BaseDropdown
+          :options="SORT_ORDER"
+          size="sm"
+          title="Sort Order"
+          @select="handleSortOrderSelection"
+        />
+        <BaseInput
+          v-model="searchQuery"
+          data-testid="search-input"
+          icon="search"
+          placeholder="Search"
+        >
+          <template #leading-icon>
+            <FontAwesomeIcon
+              :icon="faSearch"
+            />
+          </template>
+        </BaseInput>
+
+        <BaseButton
+          rounded="full"
+          variant="primary"
+        >
+          <FontAwesomeIcon
+            class="service-catalog__header-actions-button-icon"
+            :icon="faPlus"
+          />
+          <BaseTypography
+            color="white"
+            size="base"
+            tag="span"
+            weight="semibold"
+          >
+            Service Package
+          </BaseTypography>
+        </BaseButton>
+      </div>
+    </div>
+    <p>
+      <BaseTypography
+        size="base"
+        tag="span"
+        weight="regular"
+      >
+        Organize services, manage and track versioning and API service documentation.
+      </BaseTypography>
+      <BaseLink to="/learn-more">
+        <BaseTypography
+          color="accent"
+          size="base"
+          tag="span"
+          weight="regular"
+        >
+          Learn more
+        </BaseTypography>
+      </BaseLink>
+    </p>
     <ul
-      v-if="services.length"
+      v-if="servicesStore.servicesToDisplay.length > 0"
       class="catalog"
     >
       <li
-        v-for="service in services"
+        v-for="service in servicesStore.servicesToDisplay"
         :key="service.id"
-        class="service"
+        class="catalog__item"
       >
-        <div>
-          <p>
-            {{ service.name }}
-          </p>
-          <p>{{ service.description }}</p>
-        </div>
+        <BaseLink :to="`/service/${service.id}`">
+          <ServiceDetailsCard :service="service" />
+        </BaseLink>
       </li>
     </ul>
     <div
@@ -30,63 +92,139 @@
     >
       No services
     </div>
+
+    <div class="service-catalog__pagination">
+      <BasePagination
+        :page-number="servicesStore.paginationConfig.pageNumber"
+        :records-per-page="servicesStore.paginationConfig.recordsPerPage"
+        :total-records="servicesStore.totalServices"
+        @next="servicesStore.nextPage"
+        @page-click="servicesStore.setPageNumber"
+        @previous="servicesStore.previousPage"
+        @records-per-page-change="servicesStore.setRecordsPerPage"
+      />
+    </div>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref } from 'vue'
+<script setup lang="ts">
+import { computed, onBeforeMount, ref, watch } from 'vue'
+import BaseButton from '@/components/ui/BaseButton.vue'
+import BaseLink from '@/components/ui/BaseLink.vue'
+import BaseTypography from '@/components/ui/BaseTypography.vue'
+import BaseInput from '@/components/ui/BaseInput.vue'
+import ServiceDetailsCard from '@/components/molecules/ServiceDetailsCard.vue'
 import useServices from '@/composables/useServices'
+import BasePagination from '@/components/ui/BasePagination.vue'
+import BaseDropdown from '@/components/ui/BaseDropdown.vue'
+import useServicesStore from '@/stores/services'
+import debounce from '@/utils/debounce'
+import type { SortKey } from '@/types/AppTypes'
+import { faPlus, faSearch } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
-export default defineComponent({
-  name: 'ServiceCatalog',
-  setup() {
-    // Import services from the composable
-    const { services, loading } = useServices()
+const searchQuery = ref('')
 
-    // Set the search string to a Vue ref
-    const searchQuery = ref('')
+const { loading, fetchServices } = useServices()
+const servicesStore = useServicesStore()
 
-    return {
-      services,
-      loading,
-      searchQuery,
-    }
+const sortByOptions = computed<{ label: string; value: SortKey }[]>(() => [
+  {
+    label: 'Name',
+    value: 'name',
   },
+  {
+    label: 'Uptime',
+    value: 'metrics:uptime',
+  },
+  {
+    label: 'Latency',
+    value: 'metrics:latency',
+  },
+  {
+    label: 'Requests',
+    value: 'metrics:requests',
+  },
+  {
+    label: 'Errors',
+    value: 'metrics:errors',
+  },
+])
+
+const SORT_ORDER: { label: string; value: 'asc' | 'desc' }[] = [
+  {
+    label: 'Ascending',
+    value: 'asc',
+  },
+  {
+    label: 'Descending',
+    value: 'desc',
+  },
+]
+
+onBeforeMount(async () => {
+  await fetchAndStoreServices()
 })
+
+const debouncedFetchAndStoreServices = debounce(fetchAndStoreServices, 300)
+
+watch(searchQuery, async () => {
+  await debouncedFetchAndStoreServices()
+})
+
+async function fetchAndStoreServices() {
+  const { success, data } = await fetchServices(searchQuery.value)
+
+  if (success) {
+    servicesStore.setAllServices(data)
+  }
+}
+
+function handleSortBySelection(value: SortKey) {
+  servicesStore.setSortKey(value)
+}
+
+function handleSortOrderSelection(value: typeof SORT_ORDER[number]['value']) {
+  servicesStore.setSortDirection(value)
+}
 </script>
 
 <style lang="scss" scoped>
+@use '@/css/variables/typography.scss' as typography;
+
 .service-catalog {
-  margin: 2rem auto;
-  max-width: 1366px;
-  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.service-catalog__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.service-catalog__header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.service-catalog__pagination {
+  display: flex;
+  justify-content: center;
 }
 
 .catalog {
-  display: flex;
-  flex-wrap: wrap;
   list-style: none;
-  margin: 20px 0 0 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  padding: 0;
 }
 
-.service {
-  border: 1px solid #999;
-  border-radius: 10px;
-  margin: 6px;
-  padding: 8px 16px;
-  width: 200px;
-
-  p:first-of-type {
-    color: #333;
-    font-weight: 700;
-  }
-
-  p {
-    color: #666;
-  }
-}
-
-input {
-  padding: 8px 4px;
+.service-catalog__header-actions-button-icon {
+  font-size: typography.$font-size-base;
+  margin-right: 0.5rem;
 }
 </style>
