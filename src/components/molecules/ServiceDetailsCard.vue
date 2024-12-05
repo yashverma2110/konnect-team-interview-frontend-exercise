@@ -3,20 +3,9 @@
     <div class="service-details-card__content">
       <section class="service-details-card__status">
         <div class="service-details-card__status-identifier">
-          <FontAwesomeIcon
-            v-if="getServiceStatus(props.service) === 'published'"
-            class="service-details-card__status-identifier-icon success"
-            :icon="faCheck"
-          />
-          <FontAwesomeIcon
-            v-if="getServiceStatus(props.service) === 'unpublished'"
-            class="service-details-card__status-identifier-icon draft"
-            :icon="faTimes"
-          />
-          <FontAwesomeIcon
-            v-if="getServiceStatus(props.service) === 'in-progress'"
-            class="service-details-card__status-identifier-icon loading"
-            :icon="faCircleNotch"
+          <ServiceStatusIcons
+            :service="props.service"
+            size="xs"
           />
           <BaseTypography
             color="secondary"
@@ -149,15 +138,14 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import BasePill from '@/components/ui/BasePill.vue'
 import BaseCard from '@/components/ui/BaseCard.vue'
 import BaseTypography from '@/components/ui/BaseTypography.vue'
 import type { IService } from '@/types/IService'
 import useServices from '@/composables/useServices'
-import { computed } from 'vue'
 import { humanizeNumberUsingAbbreviation, humanizeServiceStatus } from '@/utils/humanization'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faCheck, faCircleNotch, faTimes } from '@fortawesome/free-solid-svg-icons'
+import ServiceStatusIcons from '../ServiceStatusIcons.vue'
 
 const props = defineProps<{
   service: IService
@@ -194,22 +182,6 @@ function getHumanizedVersionCount(service: IService) {
   align-items: center;
   justify-content: space-between;
   height: 2.5rem;
-}
-
-.service-details-card__status-identifier-icon {
-  font-size: typography.$font-size-xs;
-
-  &.success {
-    color: colors.$green-primary;
-  }
-
-  &.loading {
-    color: colors.$yellow-primary;
-  }
-
-  &.draft {
-    color: colors.$text-color-secondary;
-  }
 }
 
 .service-details-card__status-identifier {

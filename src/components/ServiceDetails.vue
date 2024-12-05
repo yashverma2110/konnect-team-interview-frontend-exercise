@@ -11,23 +11,104 @@
       >
         {{ serviceDetails?.name }}
       </BaseTypography>
-      <BaseTypography
-        color="secondary"
-        size="base"
-        tag="p"
-        weight="regular"
-      >
-        {{ humanizeServiceStatus(serviceStatus) }}
-      </BaseTypography>
+
+      <div class="service-catalog__header-status">
+        <ServiceStatusIcons
+          :service="serviceDetails"
+        />
+        <BaseTypography
+          color="secondary"
+          size="base"
+          tag="p"
+          weight="regular"
+        >
+          {{ humanizeServiceStatus(serviceStatus) }}
+        </BaseTypography>
+      </div>
     </div>
     <BaseTypography
-      color="secondary"
       size="base"
       tag="p"
       weight="regular"
     >
       {{ serviceDetails?.description }}
     </BaseTypography>
+
+    <section
+      v-if="serviceStatus === 'published'"
+      class="service-details__metrics-container"
+    >
+      <ul class="service-details__metrics-container-list">
+        <li>
+          <BaseTypography
+            size="xs"
+            tag="span"
+            weight="semibold"
+          >
+            {{ serviceDetails?.metrics.latency }}ms
+          </BaseTypography>
+          <BaseTypography
+            color="secondary"
+            size="xs"
+            tag="span"
+            weight="semibold"
+          >
+            latency
+          </BaseTypography>
+        </li>
+        <li>
+          <BaseTypography
+            size="xs"
+            tag="span"
+            weight="semibold"
+          >
+            {{ serviceDetails?.metrics.uptime }}%
+          </BaseTypography>
+          <BaseTypography
+            color="secondary"
+            size="xs"
+            tag="span"
+            weight="semibold"
+          >
+            uptime
+          </BaseTypography>
+        </li>
+        <li>
+          <BaseTypography
+            size="xs"
+            tag="span"
+            weight="semibold"
+          >
+            {{ humanizeNumberUsingAbbreviation(serviceDetails?.metrics.requests ?? 0) }}
+          </BaseTypography>
+          <BaseTypography
+            color="secondary"
+            size="xs"
+            tag="span"
+            weight="semibold"
+          >
+            requests
+          </BaseTypography>
+        </li>
+        <li>
+          <BaseTypography
+            size="xs"
+            tag="span"
+            weight="semibold"
+          >
+            {{ serviceDetails?.metrics.errors }}%
+          </BaseTypography>
+          <BaseTypography
+            color="secondary"
+            size="xs"
+            tag="span"
+            weight="semibold"
+          >
+            errors
+          </BaseTypography>
+        </li>
+      </ul>
+    </section>
 
     <section class="service-details__versions">
       <div class="service-details__versions-header">
@@ -114,8 +195,9 @@ import BasePill from '@/components/ui/BasePill.vue'
 import BaseTypography from '@/components/ui/BaseTypography.vue'
 import useServicesStore from '@/stores/services'
 import useServices from '@/composables/useServices'
-import { humanizeServiceStatus } from '@/utils/humanization'
+import { humanizeNumberUsingAbbreviation, humanizeServiceStatus } from '@/utils/humanization'
 import { getDurationSince } from '@/utils/timeUtils'
+import ServiceStatusIcons from './ServiceStatusIcons.vue'
 
 const servicesStore = useServicesStore()
 const { loading, getServiceStatus, fetchServices } = useServices()
@@ -157,8 +239,29 @@ async function fetchAndStoreServices() {
   align-items: center;
 }
 
+.service-catalog__header-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .service-details__versions-header {
   margin-bottom: 1.5rem;
+}
+
+.service-details__metrics-container {
+  display: flex;
+  align-items: center;
+}
+
+.service-details__metrics-container-list {
+  display: flex;
+  gap: 2rem;
+  padding-inline-start: 1rem;
+
+  li::marker {
+    color: colors.$green-primary;
+  }
 }
 
 .service-details__versions {
