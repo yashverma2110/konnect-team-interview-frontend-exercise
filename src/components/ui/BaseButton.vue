@@ -18,7 +18,7 @@
 import { computed } from 'vue'
 
 interface IBaseButtonProps {
-  variant: 'primary' | 'secondary' | 'accent' | 'white'
+  variant: 'primary' | 'secondary' | 'accent' | 'white' | 'transparent'
   type?: 'filled' | 'outlined'
   rounded?: 'base' | 'full'
   disabled?: boolean
@@ -45,6 +45,8 @@ const buttonVariant = computed(() => {
       return 'button_accent'
     case 'white':
       return 'button_white'
+    case 'transparent':
+      return 'button_transparent'
   }
 })
 </script>
@@ -116,5 +118,9 @@ const buttonVariant = computed(() => {
     border: 1px solid colors.$white;
     color: colors.$white;
   }
+}
+
+.button_transparent {
+  background: transparent;
 }
 </style>
