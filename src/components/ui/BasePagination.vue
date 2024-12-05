@@ -1,47 +1,48 @@
 <template>
   <div class="pagination">
-    <BaseButton
-      :disabled="props.pageNumber === 1"
-      rounded="full"
-      type="outlined"
-      variant="accent"
-      @click="emit('previous')"
-    >
-      <FontAwesomeIcon :icon="faArrowLeft" />
-    </BaseButton>
-
-    <!-- List of pages -->
-    <ul class="pagination__pages">
-      <li
-        v-for="page in listOfPages"
-        :key="page"
+    <div class="pagination__buttons">
+      <BaseButton
+        :disabled="props.pageNumber === 1"
+        rounded="full"
+        type="outlined"
+        variant="accent"
+        @click="emit('previous')"
       >
-        <BaseButton
-          :disabled="page === '...'"
-          variant="white"
-          @click="handlePageClick(page)"
+        <FontAwesomeIcon :icon="faArrowLeft" />
+      </BaseButton>
+
+      <!-- List of pages -->
+      <ul class="pagination__pages">
+        <li
+          v-for="page in listOfPages"
+          :key="page"
         >
-          <BaseTypography
-            size="sm"
-            tag="span"
-            :weight="page === props.pageNumber ? 'bold' : 'regular'"
+          <BaseButton
+            :disabled="page === '...'"
+            variant="white"
+            @click="handlePageClick(page)"
           >
-            {{ page === '...' ? '...' : page }}
-          </BaseTypography>
-        </BaseButton>
-      </li>
-    </ul>
+            <BaseTypography
+              size="sm"
+              tag="span"
+              :weight="page === props.pageNumber ? 'bold' : 'regular'"
+            >
+              {{ page === '...' ? '...' : page }}
+            </BaseTypography>
+          </BaseButton>
+        </li>
+      </ul>
 
-    <BaseButton
-      :disabled="props.pageNumber === totalPages"
-      rounded="full"
-      type="outlined"
-      variant="accent"
-      @click="emit('next')"
-    >
-      <FontAwesomeIcon :icon="faArrowRight" />
-    </BaseButton>
-
+      <BaseButton
+        :disabled="props.pageNumber === totalPages"
+        rounded="full"
+        type="outlined"
+        variant="accent"
+        @click="emit('next')"
+      >
+        <FontAwesomeIcon :icon="faArrowRight" />
+      </BaseButton>
+    </div>
     <BaseDropdown
       direction="top"
       :options="getRecordsPerPageOptions()"
@@ -123,6 +124,8 @@ function handleRecordsPerPageChange(recordsPerPage: number) {
 </script>
 
 <style scoped lang="scss">
+@use '@/css/variables/breakpoints.scss' as breakpoints;
+
 .pagination {
   display: flex;
   align-items: center;
@@ -134,5 +137,17 @@ function handleRecordsPerPageChange(recordsPerPage: number) {
   align-items: center;
   list-style: none;
   padding-inline-start: 0;
+}
+
+.pagination__buttons {
+  display: flex;
+  gap: 1rem;
+  height: 2.5rem;
+}
+
+@media (max-width: breakpoints.$breakpoint-md) {
+  .pagination {
+    flex-direction: column;
+  }
 }
 </style>

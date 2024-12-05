@@ -55,6 +55,7 @@ const buttonVariant = computed(() => {
 @use '@/css/variables/background.scss' as vars;
 @use '@/css/variables/colors.scss' as colors;
 @use '@/css/variables/typography.scss' as typography;
+@use '@/css/variables/breakpoints.scss' as breakpoints;
 
 .button {
   border-radius: 0.25rem;
@@ -124,5 +125,11 @@ const buttonVariant = computed(() => {
 .button_transparent {
   background: transparent;
   padding: 0;
+}
+
+@media (max-width: breakpoints.$breakpoint-md) {
+  .button {
+    width: 100%;
+  }
 }
 </style>

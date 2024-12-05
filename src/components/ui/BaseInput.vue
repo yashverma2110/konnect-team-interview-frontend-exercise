@@ -32,6 +32,7 @@ function handleInput(event: Event) {
 @use '@/css/variables/background.scss' as vars;
 @use '@/css/variables/colors.scss' as colors;
 @use '@/css/variables/typography.scss' as typography;
+@use '@/css/variables/breakpoints.scss' as breakpoints;
 
 .base-input__wrapper {
   background: vars.$white;
@@ -46,5 +47,11 @@ function handleInput(event: Event) {
   border: none;
   outline: none;
   margin-left: 0.4rem;
+}
+
+@media (max-width: breakpoints.$breakpoint-md) {
+  .base-input__wrapper {
+    width: 100%;
+  }
 }
 </style>

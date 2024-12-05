@@ -106,6 +106,7 @@ function handleSelect(value: string | number, index: number) {
 <style scoped lang="scss">
 @use '@/css/variables/background.scss' as vars;
 @use '@/css/variables/colors.scss' as colors;
+@use '@/css/variables/breakpoints.scss' as breakpoints;
 
 .dropdown {
   position: relative;
@@ -118,6 +119,7 @@ function handleSelect(value: string | number, index: number) {
   border-radius: 0.25rem;
   padding: 0.5rem;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .dropdown__options_top {
@@ -163,6 +165,16 @@ function handleSelect(value: string | number, index: number) {
 
   &.open {
     transform: rotate(180deg);
+  }
+}
+
+@media (max-width: breakpoints.$breakpoint-md) {
+  .dropdown {
+    width: 100%;
+  }
+
+  .dropdown__button {
+    width: 100%;
   }
 }
 </style>

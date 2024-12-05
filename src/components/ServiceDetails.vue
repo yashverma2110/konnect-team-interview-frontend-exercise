@@ -277,6 +277,7 @@ function goBack() {
 @use '@/css/variables/background.scss' as vars;
 @use '@/css/variables/colors.scss' as colors;
 @use '@/css/variables/typography.scss' as typography;
+@use '@/css/variables/breakpoints.scss' as breakpoints;
 
 .service-details__container {
   display: flex;
@@ -336,7 +337,7 @@ function goBack() {
 
 .service-details__versions {
   background: vars.$white;
-  width: 100%;
+  max-width: 100%;
   display: flex;
   flex-direction: column;
   padding: 1.25rem;
@@ -371,6 +372,34 @@ function goBack() {
   }
   to {
     transform: rotate(360deg);
+  }
+}
+
+@media (max-width: breakpoints.$breakpoint-md) {
+  .service-catalog__header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .service-catalog__header-status {
+    width: 100%;
+    text-align: left;
+  }
+
+  .service-details__metrics-container {
+    width: 100%;
+  }
+
+  .service-details__metrics-container-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  .service-details__versions-table-cell {
+    grid-template-columns: 2fr 1fr;
+    gap: 0.5rem;
   }
 }
 </style>

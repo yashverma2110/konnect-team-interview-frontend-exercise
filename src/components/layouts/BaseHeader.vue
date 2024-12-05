@@ -55,6 +55,7 @@ import { faGear, faUserGroup } from '@fortawesome/free-solid-svg-icons'
 
 <style lang="scss" scoped>
 @use '@/css/variables/background.scss' as vars;
+@use '@/css/variables/breakpoints.scss' as breakpoints;
 
 .header {
   height: 70px;
@@ -86,5 +87,11 @@ import { faGear, faUserGroup } from '@fortawesome/free-solid-svg-icons'
 
 .header__actions-user-avatar {
   height: 1.875rem;
+}
+
+@media (max-width: breakpoints.$breakpoint-md) {
+  .header__actions {
+    display: none;
+  }
 }
 </style>

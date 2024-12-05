@@ -21,6 +21,13 @@
               :class="{ 'spin': loading }"
               :icon="faSync"
             />
+            <BaseTypography
+              size="sm"
+              tag="span"
+              weight="regular"
+            >
+              Refresh
+            </BaseTypography>
           </BaseButton>
           <BaseDropdown
             :options="AUTO_REFRESH_INTERVAL_OPTIONS"
@@ -43,6 +50,7 @@
             @select="handleSortOrderSelection"
           />
         </div>
+
         <BaseInput
           v-model="searchQuery"
           data-testid="search-input"
@@ -283,6 +291,7 @@ function handleAutoRefreshSelection(value: number) {
 <style lang="scss" scoped>
 @use '@/css/variables/colors.scss' as colors;
 @use '@/css/variables/typography.scss' as typography;
+@use '@/css/variables/breakpoints.scss' as breakpoints;
 
 .service-catalog {
   display: flex;
@@ -315,10 +324,10 @@ function handleAutoRefreshSelection(value: number) {
   gap: 1.5rem;
 }
 
-.service-catalog__header-actions-sort-container {
+.service-catalog__header-actions-search-container {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 1rem;
 }
 
 .service-catalog__pagination {
@@ -339,6 +348,12 @@ function handleAutoRefreshSelection(value: number) {
   margin-right: 0.5rem;
 }
 
+.service-catalog__header-actions-sort-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .service-catalog__no-results-icon {
   margin-right: 0.5rem;
 }
@@ -355,6 +370,28 @@ function handleAutoRefreshSelection(value: number) {
   }
   to {
     transform: rotate(360deg);
+  }
+}
+
+@media (max-width: breakpoints.$breakpoint-md) {
+  .catalog {
+    grid-template-columns: 1fr;
+  }
+
+  .service-catalog__header {
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+  }
+
+  .service-catalog__header-actions {
+    flex-direction: column;
+  }
+
+  .service-catalog__header-actions-sort-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
   }
 }
 </style>
