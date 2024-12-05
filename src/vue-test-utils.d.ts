@@ -1,7 +1,8 @@
-import type { DOMWrapper } from '@vue/test-utils'
+import { VueWrapper } from '@vue/test-utils'
 
 declare module '@vue/test-utils' {
-  export class VueWrapper {
-    findTestId<K extends keyof HTMLElementTagNameMap>(dataTestid: string): DOMWrapper<HTMLElementTagNameMap[K]>
+  export interface VueWrapper {
+    findTestId(selector: string): VueWrapper
+    findAllByTestId(selector: string): VueWrapper[]
   }
 }

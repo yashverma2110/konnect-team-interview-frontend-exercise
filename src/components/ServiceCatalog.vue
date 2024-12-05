@@ -53,9 +53,9 @@
 
         <BaseInput
           v-model="searchQuery"
-          data-testid="search-input"
           icon="search"
           placeholder="Search"
+          test-id="search-input"
         >
           <template #leading-icon>
             <FontAwesomeIcon
@@ -119,8 +119,12 @@
         v-for="service in servicesStore.servicesToDisplay"
         :key="service.id"
         class="catalog__item"
+        data-testid="service-card"
       >
-        <BaseLink :to="`/service/${service.id}`">
+        <BaseLink
+          data-testid="service-card-link"
+          :to="`/service/${service.id}`"
+        >
           <ServiceDetailsCard :service="service" />
         </BaseLink>
       </li>
@@ -278,7 +282,7 @@ function appendQueryParam(key: string, value: string) {
 }
 
 function removeQueryParam(key: string) {
-  const currentQueryParams = router.currentRoute.value.query
+  const currentQueryParams = route.query
 
   router.replace({ query: { ...currentQueryParams, [key]: undefined } })
 }

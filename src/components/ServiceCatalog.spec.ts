@@ -1,13 +1,22 @@
 import { vi, describe, it, expect } from 'vitest'
-import { mount } from '@vue/test-utils'
-import ServiceCatalog from './ServiceCatalog.vue'
-import servicesData from '../../mocks/services'
+import { mount, flushPromises } from '@vue/test-utils'
+import ServiceCatalog from '@/components/ServiceCatalog.vue'
+import { getServiceMock } from '@/mocks/serviceMock'
 
 // Mock the axios module for fetching API services
 const mockedResponses = new Map()
   .set('/api/services', vi.fn(() => ({
-    data: servicesData,
+    data: [getServiceMock()],
   })))
+
+vi.mock('vue-router', () => ({
+  useRoute: vi.fn().mockReturnValue({
+    query: {},
+  }),
+  useRouter: vi.fn().mockReturnValue({
+    replace: vi.fn(),
+  }),
+}))
 
 vi.mock('axios', async () => {
   const actual: any = await vi.importActual('axios')
@@ -32,13 +41,63 @@ describe('ServiceCatalog', () => {
   })
 
   it('properly handles no services returned from the API', async () => {
-    // Provide a custom `mockedResponses` response payload instead of using the default mocked response
-    mockedResponses.get('/api/services').mockReturnValue({
+    mockedResponses.set('/api/services', vi.fn(() => ({
       data: [],
-    })
+    })))
 
     const wrapper = mount(ServiceCatalog)
 
-    expect(wrapper.findTestId('no-results').isVisible()).toBe(true)
+    await flushPromises()
+
+    expect(wrapper.findTestId('no-results').exists()).toBe(true)
+  })
+
+  it('properly handles services returned from the API', async () => {
+    mockedResponses.set('/api/services', vi.fn(() => ({
+      data: [getServiceMock()],
+    })))
+
+    const wrapper = mount(ServiceCatalog)
+
+    await flushPromises()
+
+    const serviceCards = wrapper.findAllByTestId('service-card')
+    expect(serviceCards.length).toBe(1)
+  })
+
+  it('properly handles service redirection', async () => {
+    mockedResponses.set('/api/services', vi.fn(() => ({
+      data: [getServiceMock()],
+    })))
+
+    const wrapper = mount(ServiceCatalog)
+
+    await flushPromises()
+
+    const serviceCards = wrapper.findAllByTestId('service-card')
+    expect(serviceCards.length).toBe(1)
+
+    const routerLinks = await wrapper.findAllByTestId('service-card-link')
+    expect(routerLinks.length).toBe(1)
+
+    expect(routerLinks[0].attributes('href')).toBe(`/service/${getServiceMock().id}`)
+  })
+
+  it('properly handles search input', async () => {
+    mockedResponses.set('/api/services', vi.fn(() => ({
+      data: [getServiceMock()],
+    })))
+
+    const wrapper = mount(ServiceCatalog)
+
+    await flushPromises()
+
+    const searchInput = wrapper.findTestId('search-input')
+    expect(searchInput.exists()).toBe(true)
+
+    searchInput.setValue('test')
+    expect(searchInput.element.value).toBe('test')
+
+    expect(mockedResponses.get('/api/services')).toHaveBeenCalled()
   })
 })

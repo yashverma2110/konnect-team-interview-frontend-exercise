@@ -6,6 +6,7 @@
     />
     <input
       class="base-input"
+      :data-testid="props.testId"
       :placeholder="props.placeholder"
       :value="props.modelValue"
       @input="handleInput"
@@ -17,6 +18,7 @@
 const props = defineProps<{
   modelValue: string
   placeholder?: string
+  testId?: string
 }>()
 
 const emit = defineEmits<{

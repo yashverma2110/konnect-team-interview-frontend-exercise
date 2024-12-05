@@ -9,6 +9,7 @@
           />
           <BaseTypography
             color="secondary"
+            data-testid="service-status-identifier"
             size="xs"
             tag="p"
             weight="regular"
@@ -19,11 +20,13 @@
 
         <BasePill
           v-if="getServiceStatus(props.service) === 'published'"
+          data-testid="service-version-count"
           :label="getHumanizedVersionCount(props.service)"
           rounded="full"
         />
       </section>
       <BaseTypography
+        data-testid="service-name"
         size="lg"
         tag="h2"
         weight="semibold"
@@ -32,6 +35,7 @@
       </BaseTypography>
       <BaseTypography
         color="secondary"
+        data-testid="service-description"
         size="sm"
         tag="p"
         weight="regular"
@@ -45,6 +49,7 @@
       >
         <li>
           <BaseTypography
+            data-testid="service-latency"
             size="xs"
             tag="span"
             weight="semibold"
@@ -62,6 +67,7 @@
         </li>
         <li>
           <BaseTypography
+            data-testid="service-uptime"
             size="xs"
             tag="span"
             weight="semibold"
@@ -79,6 +85,7 @@
         </li>
         <li>
           <BaseTypography
+            data-testid="service-requests"
             size="xs"
             tag="span"
             weight="semibold"
@@ -102,6 +109,7 @@
             •
           </BaseTypography>
           <BaseTypography
+            data-testid="service-errors"
             size="xs"
             tag="span"
             weight="semibold"
@@ -125,6 +133,7 @@
         <li>
           <BaseTypography
             color="secondary"
+            data-testid="service-not-configured-message"
             size="xs"
             tag="p"
             weight="semibold"

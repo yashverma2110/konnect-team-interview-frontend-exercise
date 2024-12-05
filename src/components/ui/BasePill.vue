@@ -7,6 +7,7 @@
   >
     <BaseTypography
       :color="textColorClass"
+      :data-testid="props.testId"
       size="sm"
       tag="p"
       weight="semibold"
@@ -24,6 +25,7 @@ const props = withDefaults(defineProps<{
   label: string
   variant?: 'primary' | 'secondary'
   rounded?: 'full' | 'base'
+  testId?: string
 }>(), {
   variant: 'primary',
   rounded: 'base',

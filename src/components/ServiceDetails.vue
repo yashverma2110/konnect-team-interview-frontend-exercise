@@ -1,5 +1,8 @@
 <template>
-  <div class="service-details__container">
+  <div
+    class="service-details__container"
+    data-testid="service-details-container"
+  >
     <BaseButton
       variant="transparent"
       @click="goBack"
