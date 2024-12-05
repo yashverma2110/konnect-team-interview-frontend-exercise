@@ -1,0 +1,1 @@
+export type SortKey = 'name' | 'metrics:uptime' | 'metrics:latency' | 'metrics:requests' | 'metrics:errors'

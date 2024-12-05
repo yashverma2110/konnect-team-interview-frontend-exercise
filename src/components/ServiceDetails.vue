@@ -1,0 +1,194 @@
+<template>
+  <div class="service-details">
+    <div
+      v-if="serviceDetails"
+      class="service-catalog__header"
+    >
+      <BaseTypography
+        size="xl"
+        tag="h1"
+        weight="bold"
+      >
+        {{ serviceDetails?.name }}
+      </BaseTypography>
+      <BaseTypography
+        color="secondary"
+        size="base"
+        tag="p"
+        weight="regular"
+      >
+        {{ humanizeServiceStatus(serviceStatus) }}
+      </BaseTypography>
+    </div>
+    <BaseTypography
+      color="secondary"
+      size="base"
+      tag="p"
+      weight="regular"
+    >
+      {{ serviceDetails?.description }}
+    </BaseTypography>
+
+    <section class="service-details__versions">
+      <div class="service-details__versions-header">
+        <BaseTypography
+          size="base"
+          tag="h2"
+          weight="semibold"
+        >
+          Versions ({{ serviceDetails?.versions.length }})
+        </BaseTypography>
+      </div>
+      <div
+        v-for="(version, index) in serviceDetails?.versions"
+        :key="version.id"
+        class="service-details__versions-table"
+      >
+        <div
+          class="service-details__versions-table-row"
+        >
+          <div class="service-details__versions-table-cell">
+            <div class="service-details__versions-table-cell-item">
+              <BaseTypography
+                size="sm"
+                tag="span"
+                weight="semibold"
+              >
+                v{{ version.name }}
+              </BaseTypography>
+            </div>
+            <div class="service-details__versions-table-cell-item">
+              <BaseTypography
+                color="secondary"
+                size="xs"
+                tag="p"
+                weight="regular"
+              >
+                {{ version.description }}
+              </BaseTypography>
+            </div>
+            <div class="service-details__versions-table-cell-item">
+              <div class="service-details__versions-table-pill-container">
+                <BasePill
+                  label="HTTP"
+                  variant="primary"
+                />
+                <BasePill
+                  label="REST"
+                  variant="secondary"
+                />
+              </div>
+            </div>
+            <div v-if="serviceStatus === 'published'">
+              <BaseTypography
+                size="sm"
+                tag="p"
+                weight="semibold"
+              >
+                {{ version.developer?.name }}
+              </BaseTypography>
+              <BaseTypography
+                color="secondary"
+                size="xs"
+                tag="p"
+                weight="regular"
+              >
+                {{ getDurationSince(new Date(version.updated_at)) }} ago
+              </BaseTypography>
+            </div>
+          </div>
+        </div>
+        <hr
+          v-if="index < (serviceDetails?.versions.length ?? 0) - 1"
+          class="service-details__versions-table-row-divider"
+        >
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { useRoute } from 'vue-router'
+import { computed, onMounted } from 'vue'
+import BasePill from '@/components/ui/BasePill.vue'
+import BaseTypography from '@/components/ui/BaseTypography.vue'
+import useServicesStore from '@/stores/services'
+import useServices from '@/composables/useServices'
+import { humanizeServiceStatus } from '@/utils/humanization'
+import { getDurationSince } from '@/utils/timeUtils'
+
+const servicesStore = useServicesStore()
+const { loading, getServiceStatus, fetchServices } = useServices()
+
+const route = useRoute()
+
+const serviceDetails = computed(() => servicesStore.getServiceById(route.params.id as string))
+
+const serviceStatus = computed(() => serviceDetails.value && getServiceStatus(serviceDetails.value))
+
+onMounted(async () => {
+  if (servicesStore.servicesToDisplay.length === 0) {
+    await fetchAndStoreServices()
+  }
+})
+
+async function fetchAndStoreServices() {
+  const { success, data } = await fetchServices()
+
+  if (success) {
+    servicesStore.setAllServices(data)
+  }
+}
+</script>
+
+<style scoped lang="scss">
+@use '@/css/variables/background.scss' as vars;
+@use '@/css/variables/colors.scss' as colors;
+
+.service-details {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.service-catalog__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.service-details__versions-header {
+  margin-bottom: 1.5rem;
+}
+
+.service-details__versions {
+  background: vars.$white;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 1.25rem;
+}
+
+.service-details__versions-table {
+  width: 100%;
+}
+
+.service-details__versions-table-pill-container {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.service-details__versions-table-cell {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr 2fr;
+
+  &-item {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.service-details__versions-table-row-divider {
+  border: 1px solid colors.$dark-secondary;
+}
+</style>
