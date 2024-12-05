@@ -1,222 +1,254 @@
 <template>
-  <div
-    v-if="loading"
-    class="service-catalog__loading-icon-container"
-  >
-    <FontAwesomeIcon
-      class="service-catalog__loading-icon"
-      :icon="faSpinner"
-    />
-  </div>
-  <div
-    v-else
-    class="service-details"
-  >
-    <div
-      v-if="serviceDetails"
-      class="service-catalog__header"
+  <div class="service-details__container">
+    <BaseButton
+      variant="transparent"
+      @click="goBack"
     >
       <BaseTypography
-        size="xl"
-        tag="h1"
-        weight="bold"
+        size="base"
+        tag="span"
+        weight="semibold"
       >
-        {{ serviceDetails?.name }}
+        <FontAwesomeIcon :icon="faArrowLeft" />
+        Back
+      </BaseTypography>
+    </BaseButton>
+    <div
+      v-if="loading"
+      class="service-catalog__loading-icon-container"
+    >
+      <FontAwesomeIcon
+        class="service-catalog__loading-icon"
+        :icon="faSpinner"
+      />
+    </div>
+    <div
+      v-else-if="serviceDetails"
+      class="service-details"
+    >
+      <div
+        class="service-catalog__header"
+      >
+        <BaseTypography
+          size="xl"
+          tag="h1"
+          weight="bold"
+        >
+          {{ serviceDetails?.name }}
+        </BaseTypography>
+
+        <div class="service-catalog__header-status">
+          <ServiceStatusIcons
+            :service="serviceDetails"
+          />
+          <BaseTypography
+            color="secondary"
+            size="base"
+            tag="p"
+            weight="regular"
+          >
+            {{ humanizeServiceStatus(serviceStatus) }}
+          </BaseTypography>
+        </div>
+      </div>
+      <BaseTypography
+        size="base"
+        tag="p"
+        weight="regular"
+      >
+        {{ serviceDetails?.description }}
       </BaseTypography>
 
-      <div class="service-catalog__header-status">
-        <ServiceStatusIcons
-          :service="serviceDetails"
-        />
-        <BaseTypography
-          color="secondary"
-          size="base"
-          tag="p"
-          weight="regular"
+      <section
+        v-if="serviceStatus === 'published'"
+        class="service-details__metrics-container"
+      >
+        <ul class="service-details__metrics-container-list">
+          <li>
+            <BaseTypography
+              size="xs"
+              tag="span"
+              weight="semibold"
+            >
+              {{ serviceDetails?.metrics.latency }}ms
+            </BaseTypography>
+            <BaseTypography
+              color="secondary"
+              size="xs"
+              tag="span"
+              weight="semibold"
+            >
+              latency
+            </BaseTypography>
+          </li>
+          <li>
+            <BaseTypography
+              size="xs"
+              tag="span"
+              weight="semibold"
+            >
+              {{ serviceDetails?.metrics.uptime }}%
+            </BaseTypography>
+            <BaseTypography
+              color="secondary"
+              size="xs"
+              tag="span"
+              weight="semibold"
+            >
+              uptime
+            </BaseTypography>
+          </li>
+          <li>
+            <BaseTypography
+              size="xs"
+              tag="span"
+              weight="semibold"
+            >
+              {{ humanizeNumberUsingAbbreviation(serviceDetails?.metrics.requests ?? 0) }}
+            </BaseTypography>
+            <BaseTypography
+              color="secondary"
+              size="xs"
+              tag="span"
+              weight="semibold"
+            >
+              requests
+            </BaseTypography>
+          </li>
+          <li>
+            <BaseTypography
+              size="xs"
+              tag="span"
+              weight="semibold"
+            >
+              {{ serviceDetails?.metrics.errors }}%
+            </BaseTypography>
+            <BaseTypography
+              color="secondary"
+              size="xs"
+              tag="span"
+              weight="semibold"
+            >
+              errors
+            </BaseTypography>
+          </li>
+        </ul>
+      </section>
+
+      <section class="service-details__versions">
+        <div class="service-details__versions-header">
+          <BaseTypography
+            size="base"
+            tag="h2"
+            weight="semibold"
+          >
+            Versions ({{ serviceDetails?.versions.length }})
+          </BaseTypography>
+        </div>
+        <div
+          v-for="(version, index) in serviceDetails?.versions"
+          :key="version.id"
+          class="service-details__versions-table"
         >
-          {{ humanizeServiceStatus(serviceStatus) }}
-        </BaseTypography>
-      </div>
+          <div
+            class="service-details__versions-table-row"
+          >
+            <div class="service-details__versions-table-cell">
+              <div class="service-details__versions-table-cell-item">
+                <BaseTypography
+                  size="sm"
+                  tag="span"
+                  weight="semibold"
+                >
+                  v{{ version.name }}
+                </BaseTypography>
+              </div>
+              <div class="service-details__versions-table-cell-item">
+                <BaseTypography
+                  color="secondary"
+                  size="xs"
+                  tag="p"
+                  weight="regular"
+                >
+                  {{ version.description }}
+                </BaseTypography>
+              </div>
+              <div class="service-details__versions-table-cell-item">
+                <div class="service-details__versions-table-pill-container">
+                  <BasePill
+                    label="HTTP"
+                    variant="primary"
+                  />
+                  <BasePill
+                    label="REST"
+                    variant="secondary"
+                  />
+                </div>
+              </div>
+              <div v-if="serviceStatus === 'published'">
+                <BaseTypography
+                  size="sm"
+                  tag="p"
+                  weight="semibold"
+                >
+                  {{ version.developer?.name }}
+                </BaseTypography>
+                <BaseTypography
+                  color="secondary"
+                  size="xs"
+                  tag="p"
+                  weight="regular"
+                >
+                  {{ getDurationSince(new Date(version.updated_at)) }} ago
+                </BaseTypography>
+              </div>
+            </div>
+          </div>
+          <hr
+            v-if="index < (serviceDetails?.versions.length ?? 0) - 1"
+            class="service-details__versions-table-row-divider"
+          >
+        </div>
+      </section>
     </div>
-    <BaseTypography
-      size="base"
-      tag="p"
-      weight="regular"
+    <div
+      v-else
+      class="service-details__not-found"
     >
-      {{ serviceDetails?.description }}
-    </BaseTypography>
-
-    <section
-      v-if="serviceStatus === 'published'"
-      class="service-details__metrics-container"
-    >
-      <ul class="service-details__metrics-container-list">
-        <li>
-          <BaseTypography
-            size="xs"
-            tag="span"
-            weight="semibold"
-          >
-            {{ serviceDetails?.metrics.latency }}ms
-          </BaseTypography>
-          <BaseTypography
-            color="secondary"
-            size="xs"
-            tag="span"
-            weight="semibold"
-          >
-            latency
-          </BaseTypography>
-        </li>
-        <li>
-          <BaseTypography
-            size="xs"
-            tag="span"
-            weight="semibold"
-          >
-            {{ serviceDetails?.metrics.uptime }}%
-          </BaseTypography>
-          <BaseTypography
-            color="secondary"
-            size="xs"
-            tag="span"
-            weight="semibold"
-          >
-            uptime
-          </BaseTypography>
-        </li>
-        <li>
-          <BaseTypography
-            size="xs"
-            tag="span"
-            weight="semibold"
-          >
-            {{ humanizeNumberUsingAbbreviation(serviceDetails?.metrics.requests ?? 0) }}
-          </BaseTypography>
-          <BaseTypography
-            color="secondary"
-            size="xs"
-            tag="span"
-            weight="semibold"
-          >
-            requests
-          </BaseTypography>
-        </li>
-        <li>
-          <BaseTypography
-            size="xs"
-            tag="span"
-            weight="semibold"
-          >
-            {{ serviceDetails?.metrics.errors }}%
-          </BaseTypography>
-          <BaseTypography
-            color="secondary"
-            size="xs"
-            tag="span"
-            weight="semibold"
-          >
-            errors
-          </BaseTypography>
-        </li>
-      </ul>
-    </section>
-
-    <section class="service-details__versions">
-      <div class="service-details__versions-header">
+      <BaseCard>
         <BaseTypography
           size="base"
           tag="h2"
           weight="semibold"
         >
-          Versions ({{ serviceDetails?.versions.length }})
+          <FontAwesomeIcon :icon="faExclamationTriangle" />
+          Service not found
         </BaseTypography>
-      </div>
-      <div
-        v-for="(version, index) in serviceDetails?.versions"
-        :key="version.id"
-        class="service-details__versions-table"
-      >
-        <div
-          class="service-details__versions-table-row"
-        >
-          <div class="service-details__versions-table-cell">
-            <div class="service-details__versions-table-cell-item">
-              <BaseTypography
-                size="sm"
-                tag="span"
-                weight="semibold"
-              >
-                v{{ version.name }}
-              </BaseTypography>
-            </div>
-            <div class="service-details__versions-table-cell-item">
-              <BaseTypography
-                color="secondary"
-                size="xs"
-                tag="p"
-                weight="regular"
-              >
-                {{ version.description }}
-              </BaseTypography>
-            </div>
-            <div class="service-details__versions-table-cell-item">
-              <div class="service-details__versions-table-pill-container">
-                <BasePill
-                  label="HTTP"
-                  variant="primary"
-                />
-                <BasePill
-                  label="REST"
-                  variant="secondary"
-                />
-              </div>
-            </div>
-            <div v-if="serviceStatus === 'published'">
-              <BaseTypography
-                size="sm"
-                tag="p"
-                weight="semibold"
-              >
-                {{ version.developer?.name }}
-              </BaseTypography>
-              <BaseTypography
-                color="secondary"
-                size="xs"
-                tag="p"
-                weight="regular"
-              >
-                {{ getDurationSince(new Date(version.updated_at)) }} ago
-              </BaseTypography>
-            </div>
-          </div>
-        </div>
-        <hr
-          v-if="index < (serviceDetails?.versions.length ?? 0) - 1"
-          class="service-details__versions-table-row-divider"
-        >
-      </div>
-    </section>
+      </BaseCard>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { computed, onMounted } from 'vue'
+import { faArrowLeft, faExclamationTriangle, faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import BasePill from '@/components/ui/BasePill.vue'
+import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseTypography from '@/components/ui/BaseTypography.vue'
 import useServicesStore from '@/stores/services'
+import BaseCard from '@/components/ui/BaseCard.vue'
+import ServiceStatusIcons from '@/components/ServiceStatusIcons.vue'
 import useServices from '@/composables/useServices'
 import { humanizeNumberUsingAbbreviation, humanizeServiceStatus } from '@/utils/humanization'
 import { getDurationSince } from '@/utils/timeUtils'
-import ServiceStatusIcons from './ServiceStatusIcons.vue'
-import { faSpinner } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 const servicesStore = useServicesStore()
 const { loading, getServiceStatus, fetchServices } = useServices()
 
 const route = useRoute()
+const router = useRouter()
 
 const serviceDetails = computed(() => servicesStore.getServiceById(route.params.id as string))
 
@@ -235,12 +267,22 @@ async function fetchAndStoreServices() {
     servicesStore.setAllServices(data)
   }
 }
+
+function goBack() {
+  router.go(-1)
+}
 </script>
 
 <style scoped lang="scss">
 @use '@/css/variables/background.scss' as vars;
 @use '@/css/variables/colors.scss' as colors;
 @use '@/css/variables/typography.scss' as typography;
+
+.service-details__container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
 
 .service-catalog__loading-icon-container {
   display: flex;

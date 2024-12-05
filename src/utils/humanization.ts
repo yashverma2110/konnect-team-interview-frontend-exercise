@@ -1,6 +1,6 @@
 import type { ServiceStatus } from '@/types/IService'
 
-export function humanizeServiceStatus(status: ServiceStatus) {
+export function humanizeServiceStatus(status?: ServiceStatus) {
   switch (status) {
     case 'published':
       return 'Published to portal'

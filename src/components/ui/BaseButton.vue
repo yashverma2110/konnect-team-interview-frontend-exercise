@@ -62,6 +62,7 @@ const buttonVariant = computed(() => {
   padding: 0.75rem 1rem;
   border: none;
   cursor: pointer;
+  width: fit-content;
 
   &.button_rounded-full {
     border-radius: 100px;
@@ -122,5 +123,6 @@ const buttonVariant = computed(() => {
 
 .button_transparent {
   background: transparent;
+  padding: 0;
 }
 </style>
