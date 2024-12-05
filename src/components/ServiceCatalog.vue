@@ -1,15 +1,5 @@
 <template>
   <div
-    v-if="loading"
-    class="service-catalog__loading-icon-container"
-  >
-    <FontAwesomeIcon
-      class="service-catalog__loading-icon"
-      :icon="faSpinner"
-    />
-  </div>
-  <div
-    v-else
     class="service-catalog"
   >
     <div class="service-catalog__header">
@@ -84,8 +74,17 @@
         </BaseTypography>
       </BaseLink>
     </p>
+    <div
+      v-if="loading"
+      class="service-catalog__loading-icon-container"
+    >
+      <FontAwesomeIcon
+        class="service-catalog__loading-icon"
+        :icon="faSpinner"
+      />
+    </div>
     <ul
-      v-if="servicesStore.servicesToDisplay.length > 0"
+      v-else-if="servicesStore.servicesToDisplay.length > 0"
       class="catalog"
     >
       <li
@@ -102,7 +101,20 @@
       v-else
       data-testid="no-results"
     >
-      No services
+      <BaseCard>
+        <BaseTypography
+          color="secondary"
+          size="base"
+          tag="span"
+          weight="regular"
+        >
+          <FontAwesomeIcon
+            :icon="faExclamationTriangle"
+            class="service-catalog__no-results-icon"
+          />
+          No services found
+        </BaseTypography>
+      </BaseCard>
     </div>
 
     <div class="service-catalog__pagination">
@@ -132,8 +144,9 @@ import BaseDropdown from '@/components/ui/BaseDropdown.vue'
 import useServicesStore from '@/stores/services'
 import debounce from '@/utils/debounce'
 import type { SortKey } from '@/types/AppTypes'
-import { faPlus, faSearch, faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { faExclamationTriangle, faPlus, faSearch, faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import BaseCard from '@/components/ui/BaseCard.vue'
 
 const searchQuery = ref('')
 
@@ -251,6 +264,10 @@ function handleSortOrderSelection(value: typeof SORT_ORDER[number]['value']) {
 
 .service-catalog__header-actions-button-icon {
   font-size: typography.$font-size-base;
+  margin-right: 0.5rem;
+}
+
+.service-catalog__no-results-icon {
   margin-right: 0.5rem;
 }
 
