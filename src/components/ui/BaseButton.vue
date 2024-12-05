@@ -1,0 +1,120 @@
+<template>
+  <button
+    class="button"
+    :class="[
+      buttonVariant,
+      { 'button_outlined': props.type === 'outlined' },
+      { 'button_rounded-full': props.rounded === 'full' },
+      { 'button_disabled': props.disabled },
+    ]"
+    :disabled="props.disabled"
+    @click="emit('click')"
+  >
+    <slot />
+  </button>
+</template>
+
+<script setup lang="ts">
+import { computed } from 'vue'
+
+interface IBaseButtonProps {
+  variant: 'primary' | 'secondary' | 'accent' | 'white'
+  type?: 'filled' | 'outlined'
+  rounded?: 'base' | 'full'
+  disabled?: boolean
+}
+
+const props = withDefaults(defineProps<IBaseButtonProps>(), {
+  type: 'filled',
+  rounded: 'base',
+  disabled: false,
+})
+
+const emit = defineEmits<{
+  (e: 'click'): void
+}>()
+
+const buttonVariant = computed(() => {
+  switch (props.variant) {
+    case 'primary':
+    default:
+      return 'button_primary'
+    case 'secondary':
+      return 'button_secondary'
+    case 'accent':
+      return 'button_accent'
+    case 'white':
+      return 'button_white'
+  }
+})
+</script>
+
+<style lang="scss" scoped>
+@use '@/css/variables/background.scss' as vars;
+@use '@/css/variables/colors.scss' as colors;
+@use '@/css/variables/typography.scss' as typography;
+
+.button {
+  border-radius: 0.25rem;
+  color: vars.$white;
+  padding: 0.75rem 1rem;
+  border: none;
+  cursor: pointer;
+
+  &.button_rounded-full {
+    border-radius: 100px;
+
+    &.button_disabled {
+      border: 1px solid colors.$border-color;
+      color: colors.$text-color-secondary;
+    }
+  }
+
+  &.button_disabled {
+    background: colors.$border-color;
+    color: colors.$text-color-secondary;
+  }
+}
+
+.button_primary {
+  background: colors.$green-primary;
+
+  &.button_outlined {
+    background: transparent;
+    border: 1px solid colors.$green-primary;
+    color: colors.$green-primary;
+  }
+}
+
+.button_secondary {
+  background: colors.$blue-secondary;
+
+  &.button_outlined {
+    background: transparent;
+    border: 1px solid colors.$blue-secondary;
+    color: colors.$blue-secondary;
+  }
+}
+
+.button_accent {
+  background: colors.$blue-primary;
+
+  &.button_outlined {
+    background: transparent;
+    border: 1px solid colors.$blue-primary;
+    color: colors.$blue-primary;
+  }
+}
+
+.button_white {
+  background: colors.$white;
+  color: colors.$text-color-primary;
+  border: 1px solid colors.$border-color;
+
+  &.button_outlined {
+    background: transparent;
+    border: 1px solid colors.$white;
+    color: colors.$white;
+  }
+}
+</style>
