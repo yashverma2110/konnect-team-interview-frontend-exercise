@@ -13,12 +13,14 @@
       <div class="service-catalog__header-actions">
         <BaseDropdown
           :options="sortByOptions"
+          :selected-option="selectedSortKeyOptionIndex"
           size="sm"
           title="Sort By"
           @select="handleSortBySelection"
         />
         <BaseDropdown
           :options="SORT_ORDER"
+          :selected-option="selectedSortOrderOptionIndex"
           size="sm"
           title="Sort Order"
           @select="handleSortOrderSelection"
@@ -109,8 +111,8 @@
           weight="regular"
         >
           <FontAwesomeIcon
-            :icon="faExclamationTriangle"
             class="service-catalog__no-results-icon"
+            :icon="faExclamationTriangle"
           />
           No services found
         </BaseTypography>
@@ -132,6 +134,9 @@
 </template>
 
 <script setup lang="ts">
+import { useRoute, useRouter } from 'vue-router'
+import { faExclamationTriangle, faPlus, faSearch, faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { computed, onBeforeMount, ref, watch } from 'vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseLink from '@/components/ui/BaseLink.vue'
@@ -144,14 +149,15 @@ import BaseDropdown from '@/components/ui/BaseDropdown.vue'
 import useServicesStore from '@/stores/services'
 import debounce from '@/utils/debounce'
 import type { SortKey } from '@/types/AppTypes'
-import { faExclamationTriangle, faPlus, faSearch, faSpinner } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import BaseCard from '@/components/ui/BaseCard.vue'
+import { SORT_ORDER, VALID_SORT_KEYS } from '@/config/constants'
 
 const searchQuery = ref('')
 
 const { loading, fetchServices } = useServices()
 const servicesStore = useServicesStore()
+const route = useRoute()
+const router = useRouter()
 
 const sortByOptions = computed<{ label: string; value: SortKey }[]>(() => [
   {
@@ -176,18 +182,34 @@ const sortByOptions = computed<{ label: string; value: SortKey }[]>(() => [
   },
 ])
 
-const SORT_ORDER: { label: string; value: 'asc' | 'desc' }[] = [
-  {
-    label: 'Ascending',
-    value: 'asc',
-  },
-  {
-    label: 'Descending',
-    value: 'desc',
-  },
-]
+const selectedSortKeyOptionIndex = computed(() => {
+  return sortByOptions.value.findIndex((option) => option.value === servicesStore.sortKey)
+})
+
+const selectedSortOrderOptionIndex = computed(() => {
+  return SORT_ORDER.findIndex((option) => option.value === servicesStore.sortDirection)
+})
 
 onBeforeMount(async () => {
+  const searchQueryFromRoute = route.query.search?.toString()
+
+  const sortByFromRoute = route.query.sortBy?.toString()
+  const sortOrderFromRoute = route.query.sortOrder?.toString()
+
+  if (sortByFromRoute && VALID_SORT_KEYS.includes(sortByFromRoute as SortKey)) {
+    servicesStore.setSortKey(sortByFromRoute as SortKey)
+  }
+
+  if (sortOrderFromRoute === 'asc' || sortOrderFromRoute === 'desc') {
+    servicesStore.setSortDirection(sortOrderFromRoute)
+  }
+
+  if (searchQueryFromRoute) {
+    searchQuery.value = searchQueryFromRoute
+    return
+  }
+
+
   await fetchAndStoreServices()
 })
 
@@ -202,15 +224,34 @@ async function fetchAndStoreServices() {
 
   if (success) {
     servicesStore.setAllServices(data)
+    if (searchQuery.value) {
+      appendQueryParam('search', searchQuery.value)
+    } else {
+      removeQueryParam('search')
+    }
   }
 }
 
 function handleSortBySelection(value: SortKey) {
   servicesStore.setSortKey(value)
+  appendQueryParam('sortBy', value)
 }
 
 function handleSortOrderSelection(value: typeof SORT_ORDER[number]['value']) {
   servicesStore.setSortDirection(value)
+  appendQueryParam('sortOrder', value)
+}
+
+function appendQueryParam(key: string, value: string) {
+  const currentQueryParams = route.query
+
+  router.replace({ query: { ...currentQueryParams, [key]: value } })
+}
+
+function removeQueryParam(key: string) {
+  const currentQueryParams = router.currentRoute.value.query
+
+  router.replace({ query: { ...currentQueryParams, [key]: undefined } })
 }
 </script>
 

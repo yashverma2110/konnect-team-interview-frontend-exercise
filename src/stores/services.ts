@@ -128,6 +128,7 @@ export default defineStore('services', () => {
     // computed
     servicesToDisplay,
     sortKey,
+    sortDirection,
     paginationConfig,
     totalServices,
     // actions
