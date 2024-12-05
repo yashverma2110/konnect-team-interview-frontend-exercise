@@ -12,3 +12,22 @@ export const SORT_ORDER: { label: string; value: 'asc' | 'desc' }[] = [
     value: 'desc',
   },
 ]
+
+export const AUTO_REFRESH_INTERVAL_OPTIONS: { label: string; value: number }[] = [
+  {
+    label: '5s',
+    value: 10,
+  },
+  {
+    label: '10s',
+    value: 10,
+  },
+  {
+    label: '20s',
+    value: 20,
+  },
+  {
+    label: '30s',
+    value: 30,
+  },
+]

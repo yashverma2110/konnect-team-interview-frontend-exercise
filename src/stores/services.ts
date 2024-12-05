@@ -5,6 +5,7 @@ import type { SortKey } from '@/types/AppTypes'
 
 export default defineStore('services', () => {
   const allServices = ref<IService[]>([])
+  const searchQuery = ref<string>('')
   const sortKey = ref<SortKey>('name')
   const sortDirection = ref<'asc' | 'desc'>('asc')
   const paginationConfig = ref<{
@@ -124,8 +125,13 @@ export default defineStore('services', () => {
     return allServices.value.find(service => service.id === id)
   }
 
+  function setSearchQuery(query: string) {
+    searchQuery.value = query
+  }
+
   return {
     // computed
+    searchQuery,
     servicesToDisplay,
     sortKey,
     sortDirection,
@@ -133,6 +139,7 @@ export default defineStore('services', () => {
     totalServices,
     // actions
     setAllServices,
+    setSearchQuery,
     setSortKey,
     setSortDirection,
     setPagination,

@@ -11,20 +11,38 @@
         Service Hub
       </BaseTypography>
       <div class="service-catalog__header-actions">
-        <BaseDropdown
-          :options="sortByOptions"
-          :selected-option="selectedSortKeyOptionIndex"
-          size="sm"
-          title="Sort By"
-          @select="handleSortBySelection"
-        />
-        <BaseDropdown
-          :options="SORT_ORDER"
-          :selected-option="selectedSortOrderOptionIndex"
-          size="sm"
-          title="Sort Order"
-          @select="handleSortOrderSelection"
-        />
+        <div class="service-catalog__header-actions-sort-container">
+          <BaseButton
+            variant="white"
+            @click="debouncedFetchAndStoreServices"
+          >
+            <FontAwesomeIcon
+              class="service-catalog__header-actions-refresh-icon"
+              :class="{ 'spin': loading }"
+              :icon="faSync"
+            />
+          </BaseButton>
+          <BaseDropdown
+            :options="AUTO_REFRESH_INTERVAL_OPTIONS"
+            size="sm"
+            title="Auto Refresh"
+            @select="handleAutoRefreshSelection"
+          />
+          <BaseDropdown
+            :options="sortByOptions"
+            :selected-option="selectedSortKeyOptionIndex"
+            size="sm"
+            title="Sort By"
+            @select="handleSortBySelection"
+          />
+          <BaseDropdown
+            :options="SORT_ORDER"
+            :selected-option="selectedSortOrderOptionIndex"
+            size="sm"
+            title="Sort Order"
+            @select="handleSortOrderSelection"
+          />
+        </div>
         <BaseInput
           v-model="searchQuery"
           data-testid="search-input"
@@ -135,7 +153,7 @@
 
 <script setup lang="ts">
 import { useRoute, useRouter } from 'vue-router'
-import { faExclamationTriangle, faPlus, faSearch, faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { faExclamationTriangle, faPlus, faSearch, faSpinner, faSync } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { computed, onBeforeMount, ref, watch } from 'vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
@@ -150,11 +168,11 @@ import useServicesStore from '@/stores/services'
 import debounce from '@/utils/debounce'
 import type { SortKey } from '@/types/AppTypes'
 import BaseCard from '@/components/ui/BaseCard.vue'
-import { SORT_ORDER, VALID_SORT_KEYS } from '@/config/constants'
+import { AUTO_REFRESH_INTERVAL_OPTIONS, SORT_ORDER, VALID_SORT_KEYS } from '@/config/constants'
 
 const searchQuery = ref('')
 
-const { loading, fetchServices } = useServices()
+const { loading, fetchServices, setAutoRefreshInterval } = useServices()
 const servicesStore = useServicesStore()
 const route = useRoute()
 const router = useRouter()
@@ -211,6 +229,8 @@ onBeforeMount(async () => {
 
 
   await fetchAndStoreServices()
+
+  setAutoRefreshInterval(5)
 })
 
 const debouncedFetchAndStoreServices = debounce(fetchAndStoreServices, 300)
@@ -224,6 +244,7 @@ async function fetchAndStoreServices() {
 
   if (success) {
     servicesStore.setAllServices(data)
+    servicesStore.setSearchQuery(searchQuery.value)
     if (searchQuery.value) {
       appendQueryParam('search', searchQuery.value)
     } else {
@@ -252,6 +273,10 @@ function removeQueryParam(key: string) {
   const currentQueryParams = router.currentRoute.value.query
 
   router.replace({ query: { ...currentQueryParams, [key]: undefined } })
+}
+
+function handleAutoRefreshSelection(value: number) {
+  setAutoRefreshInterval(value)
 }
 </script>
 
@@ -290,6 +315,12 @@ function removeQueryParam(key: string) {
   gap: 1.5rem;
 }
 
+.service-catalog__header-actions-sort-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .service-catalog__pagination {
   display: flex;
   justify-content: center;
@@ -310,6 +341,12 @@ function removeQueryParam(key: string) {
 
 .service-catalog__no-results-icon {
   margin-right: 0.5rem;
+}
+
+.service-catalog__header-actions-refresh-icon {
+  &.spin {
+    animation: spin 1s linear infinite;
+  }
 }
 
 @keyframes spin {
