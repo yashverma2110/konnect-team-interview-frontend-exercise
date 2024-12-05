@@ -1,5 +1,17 @@
 <template>
-  <div class="service-details">
+  <div
+    v-if="loading"
+    class="service-catalog__loading-icon-container"
+  >
+    <FontAwesomeIcon
+      class="service-catalog__loading-icon"
+      :icon="faSpinner"
+    />
+  </div>
+  <div
+    v-else
+    class="service-details"
+  >
     <div
       v-if="serviceDetails"
       class="service-catalog__header"
@@ -198,6 +210,8 @@ import useServices from '@/composables/useServices'
 import { humanizeNumberUsingAbbreviation, humanizeServiceStatus } from '@/utils/humanization'
 import { getDurationSince } from '@/utils/timeUtils'
 import ServiceStatusIcons from './ServiceStatusIcons.vue'
+import { faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 const servicesStore = useServicesStore()
 const { loading, getServiceStatus, fetchServices } = useServices()
@@ -226,6 +240,20 @@ async function fetchAndStoreServices() {
 <style scoped lang="scss">
 @use '@/css/variables/background.scss' as vars;
 @use '@/css/variables/colors.scss' as colors;
+@use '@/css/variables/typography.scss' as typography;
+
+.service-catalog__loading-icon-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.service-catalog__loading-icon {
+  animation: spin 1s linear infinite;
+  color: colors.$text-color-secondary;
+  font-size: typography.$font-size-xl;
+}
 
 .service-details {
   display: flex;
@@ -293,5 +321,14 @@ async function fetchAndStoreServices() {
 
 .service-details__versions-table-row-divider {
   border: 1px solid colors.$dark-secondary;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>

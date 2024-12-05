@@ -1,5 +1,17 @@
 <template>
-  <div class="service-catalog">
+  <div
+    v-if="loading"
+    class="service-catalog__loading-icon-container"
+  >
+    <FontAwesomeIcon
+      class="service-catalog__loading-icon"
+      :icon="faSpinner"
+    />
+  </div>
+  <div
+    v-else
+    class="service-catalog"
+  >
     <div class="service-catalog__header">
       <BaseTypography
         size="xl"
@@ -120,7 +132,7 @@ import BaseDropdown from '@/components/ui/BaseDropdown.vue'
 import useServicesStore from '@/stores/services'
 import debounce from '@/utils/debounce'
 import type { SortKey } from '@/types/AppTypes'
-import { faPlus, faSearch } from '@fortawesome/free-solid-svg-icons'
+import { faPlus, faSearch, faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 const searchQuery = ref('')
@@ -190,12 +202,26 @@ function handleSortOrderSelection(value: typeof SORT_ORDER[number]['value']) {
 </script>
 
 <style lang="scss" scoped>
+@use '@/css/variables/colors.scss' as colors;
 @use '@/css/variables/typography.scss' as typography;
 
 .service-catalog {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+}
+
+.service-catalog__loading-icon-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.service-catalog__loading-icon {
+  animation: spin 1s linear infinite;
+  color: colors.$text-color-secondary;
+  font-size: typography.$font-size-xl;
 }
 
 .service-catalog__header {
@@ -226,5 +252,14 @@ function handleSortOrderSelection(value: typeof SORT_ORDER[number]['value']) {
 .service-catalog__header-actions-button-icon {
   font-size: typography.$font-size-base;
   margin-right: 0.5rem;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>
