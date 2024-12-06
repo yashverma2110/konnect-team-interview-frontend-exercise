@@ -135,6 +135,25 @@
       </li>
     </ul>
     <div
+      v-else-if="error"
+      data-testid="no-results"
+    >
+      <BaseCard>
+        <BaseTypography
+          color="secondary"
+          size="base"
+          tag="span"
+          weight="regular"
+        >
+          <FontAwesomeIcon
+            class="service-catalog__no-results-icon"
+            :icon="faExclamationTriangle"
+          />
+          Unable to fetch services, please raise a ticket with support if issue persists.
+        </BaseTypography>
+      </BaseCard>
+    </div>
+    <div
       v-else
       data-testid="no-results"
     >
@@ -189,7 +208,7 @@ import { AUTO_REFRESH_INTERVAL_OPTIONS, SORT_ORDER, VALID_SORT_KEYS } from '@/co
 
 const searchQuery = ref('')
 
-const { loading, fetchServices, setAutoRefreshInterval } = useServices()
+const { loading, error, fetchServices, setAutoRefreshInterval } = useServices()
 const servicesStore = useServicesStore()
 const route = useRoute()
 const router = useRouter()

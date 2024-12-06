@@ -228,6 +228,25 @@
       </section>
     </div>
     <div
+      v-else-if="error"
+      data-testid="no-results"
+    >
+      <BaseCard>
+        <BaseTypography
+          color="secondary"
+          size="base"
+          tag="span"
+          weight="regular"
+        >
+          <FontAwesomeIcon
+            class="service-catalog__no-results-icon"
+            :icon="faExclamationTriangle"
+          />
+          Unable to fetch services, please raise a ticket with support if issue persists.
+        </BaseTypography>
+      </BaseCard>
+    </div>
+    <div
       v-else
       class="service-details__not-found"
     >
@@ -262,7 +281,7 @@ import { humanizeNumberUsingAbbreviation, humanizeServiceStatus } from '@/utils/
 import { getDurationSince } from '@/utils/timeUtils'
 
 const servicesStore = useServicesStore()
-const { loading, getServiceStatus, fetchServices } = useServices()
+const { loading, error, getServiceStatus, fetchServices } = useServices()
 
 const route = useRoute()
 const router = useRouter()
