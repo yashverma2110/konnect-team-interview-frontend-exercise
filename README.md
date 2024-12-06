@@ -36,6 +36,20 @@ Modify the provided Vue 3 app to match [this mock](https://www.figma.com/file/sw
 - [Component Tests and/or Unit Tests](#run-component-and-unit-tests-with-vitest-and-optionally-vue-test-utils)
 - Other items covered in your Panel 1 interview
 
+## Suggestions on UX improvements
+
+- A socket connection to refresh the metrics at user-defined intervals so there are real-time updates. Polling implementation is inefficient.
+- A filter to filter service by status (e.g. only show services that are `configured`)
+- Persisting pagination state in local storage so that if a user navigates to a service, then returns to the service catalog, they are still on the same page they left off at
+- A tooltip on the versions pill on service card to sneak peak at the latest version
+- Ability to pin a service to the top of the list
+- Pagination and sort order can be maintained by backend for overall performance which can be persisted in the request URL
+- A dedicated section on the service details card to see the last developer who updated the service
+
+# Few features that could be good to have
+- Revert to a version from the service details page
+- A chart on service details page to show active requests, errors, latency and uptime
+
 ## Evaluation
 
 We will review your code for quality and your ability to talk through it, how you approach the UI, and what tradeoffs you make. Specifically we'll be looking at the following:
