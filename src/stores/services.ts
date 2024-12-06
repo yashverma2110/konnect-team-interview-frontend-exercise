@@ -19,48 +19,48 @@ export default defineStore('services', () => {
   const servicesToDisplay = computed<IService[]>(() => {
     const sortedServices = allServices.value.sort((serviceA, serviceB) => {
       if (sortKey.value === 'metrics:uptime') {
-        if (!serviceB.published) {
-          return sortDirection.value === 'asc' ? 1 : -1
+        if (!serviceA.metrics?.uptime || !serviceB.metrics?.uptime) {
+          return 0
         }
 
-        if (!serviceA.published) {
-          return sortDirection.value === 'asc' ? -1 : 1
+        if (sortDirection.value === 'asc') {
+          return serviceA.metrics.uptime - serviceB.metrics.uptime
         }
 
         return serviceB.metrics.uptime - serviceA.metrics.uptime
       }
 
       if (sortKey.value === 'metrics:errors') {
-        if (!serviceB.published) {
-          return sortDirection.value === 'asc' ? 1 : -1
+        if (!serviceA.metrics?.errors || !serviceB.metrics?.errors) {
+          return 0
         }
 
-        if (!serviceA.published) {
-          return sortDirection.value === 'asc' ? -1 : 1
+        if (sortDirection.value === 'asc') {
+          return serviceA.metrics.errors - serviceB.metrics.errors
         }
 
         return serviceB.metrics.errors - serviceA.metrics.errors
       }
 
       if (sortKey.value === 'metrics:latency') {
-        if (!serviceB.published) {
-          return sortDirection.value === 'asc' ? 1 : -1
+        if (!serviceA.metrics?.latency || !serviceB.metrics?.latency) {
+          return 0
         }
 
-        if (!serviceA.published) {
-          return sortDirection.value === 'asc' ? -1 : 1
+        if (sortDirection.value === 'asc') {
+          return serviceA.metrics.latency - serviceB.metrics.latency
         }
 
         return serviceB.metrics.latency - serviceA.metrics.latency
       }
 
       if (sortKey.value === 'metrics:requests') {
-        if (!serviceB.published) {
-          return sortDirection.value === 'asc' ? 1 : -1
+        if (!serviceA.metrics?.requests || !serviceB.metrics?.requests) {
+          return 0
         }
 
-        if (!serviceA.published) {
-          return sortDirection.value === 'asc' ? -1 : 1
+        if (sortDirection.value === 'asc') {
+          return serviceA.metrics.requests - serviceB.metrics.requests
         }
 
         return serviceB.metrics.requests - serviceA.metrics.requests
