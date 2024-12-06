@@ -43,6 +43,13 @@
         {{ props.service.description }}
       </BaseTypography>
 
+      <div class="service-details-card__developer-avatars">
+        <BaseAvatarGroup
+          v-if="developerAvatars.length > 0"
+          :avatars="developerAvatars"
+        />
+      </div>
+
       <ul
         v-if="getServiceStatus(props.service) === 'published'"
         class="service-catalog__metrics"
@@ -148,6 +155,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import BaseAvatarGroup from '@/components/ui/BaseAvatarGroup.vue'
 import BasePill from '@/components/ui/BasePill.vue'
 import BaseCard from '@/components/ui/BaseCard.vue'
 import BaseTypography from '@/components/ui/BaseTypography.vue'
@@ -168,6 +176,18 @@ const serviceStatusIdentifier = computed(() => {
   return status
 })
 
+const developerAvatars = computed(() => {
+  const avatars = []
+
+  for (const version of props.service.versions) {
+    if (version.developer?.avatar) {
+      avatars.push({ src: version.developer.avatar, alt: version.developer.name })
+    }
+  }
+
+  return avatars
+})
+
 function getHumanizedVersionCount(service: IService) {
   const suffix = service.versions.length > 1 ? 's' : ''
 
@@ -180,6 +200,7 @@ function getHumanizedVersionCount(service: IService) {
 @use '@/css/variables/typography.scss' as typography;
 
 .service-details-card__content {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -197,6 +218,12 @@ function getHumanizedVersionCount(service: IService) {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+.service-details-card__developer-avatars {
+  position: absolute;
+  right: 1rem;
+  bottom: 0.25rem;
 }
 
 .service-catalog__metrics {

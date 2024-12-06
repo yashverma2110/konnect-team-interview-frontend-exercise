@@ -13,6 +13,16 @@ const router = createRouter({
       name: 'service-details',
       component: () => import('../views/PageServiceDetails.vue'),
     },
+    {
+      path: '/create-service',
+      name: 'create-service',
+      component: () => import('../views/PageCreateService.vue'),
+    },
+    {
+      path: '/learn-more',
+      name: 'learn-more',
+      component: () => import('../views/PageLearnMore.vue'),
+    },
   ],
 })
 

@@ -155,6 +155,7 @@
         >
           <div
             class="service-details__versions-table-row"
+            data-testid="service-details-versions-table-row"
           >
             <div class="service-details__versions-table-cell">
               <div class="service-details__versions-table-cell-item">
@@ -188,22 +189,34 @@
                   />
                 </div>
               </div>
-              <div v-if="serviceStatus === 'published'">
-                <BaseTypography
-                  size="sm"
-                  tag="p"
-                  weight="semibold"
-                >
-                  {{ version.developer?.name }}
-                </BaseTypography>
-                <BaseTypography
-                  color="secondary"
-                  size="xs"
-                  tag="p"
-                  weight="regular"
-                >
-                  {{ getDurationSince(new Date(version.updated_at)) }} ago
-                </BaseTypography>
+              <div
+                v-if="serviceStatus === 'published'"
+                class="service-details__versions-table-cell-item"
+              >
+                <div class="service-details__versions-table-avatar-group">
+                <BaseAvatarGroup
+                  :avatars="developerAvatars"
+                  />
+                </div>
+                <div>
+                  <BaseTypography
+                    data-testid="developer-name"
+                    size="sm"
+                    tag="p"
+                    weight="semibold"
+                  >
+                    {{ version.developer?.name }}
+                  </BaseTypography>
+                  <BaseTypography
+                    color="secondary"
+                    data-testid="version-updated-at"
+                    size="xs"
+                    tag="p"
+                    weight="regular"
+                  >
+                    {{ getDurationSince(new Date(version.updated_at)) }} ago
+                  </BaseTypography>
+                </div>
               </div>
             </div>
           </div>
@@ -238,6 +251,7 @@ import { computed, onMounted } from 'vue'
 import { faArrowLeft, faExclamationTriangle, faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import BasePill from '@/components/ui/BasePill.vue'
+import BaseAvatarGroup from '@/components/ui/BaseAvatarGroup.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseTypography from '@/components/ui/BaseTypography.vue'
 import useServicesStore from '@/stores/services'
@@ -254,6 +268,17 @@ const route = useRoute()
 const router = useRouter()
 
 const serviceDetails = computed(() => servicesStore.getServiceById(route.params.id as string))
+const developerAvatars = computed(() => {
+  const avatars = []
+
+  for (const version of serviceDetails.value?.versions ?? []) {
+    if (version.developer?.avatar) {
+      avatars.push({ src: version.developer.avatar, alt: version.developer.name })
+    }
+  }
+
+  return avatars
+})
 
 const serviceStatus = computed(() => serviceDetails.value && getServiceStatus(serviceDetails.value))
 
@@ -353,6 +378,10 @@ function goBack() {
 .service-details__versions-table-pill-container {
   display: flex;
   gap: 0.25rem;
+}
+
+.service-details__versions-table-avatar-group {
+  width: 5rem;
 }
 
 .service-details__versions-table-cell {

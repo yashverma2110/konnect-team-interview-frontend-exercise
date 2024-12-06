@@ -67,6 +67,7 @@
         <BaseButton
           rounded="full"
           variant="primary"
+          @click="router.push('/create-service')"
         >
           <FontAwesomeIcon
             class="service-catalog__header-actions-button-icon"
