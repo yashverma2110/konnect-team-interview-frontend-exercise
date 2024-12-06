@@ -63,10 +63,13 @@ const buttonVariant = computed(() => {
   padding: 0.5rem;
   border: none;
   cursor: pointer;
+  min-width: 2rem;
   width: fit-content;
 
   &.button_rounded-full {
-    border-radius: 100px;
+    border-radius: 50%;
+    width: 2.5rem;
+    height: 2.5rem;
 
     &.button_disabled {
       border: 1px solid colors.$border-color;

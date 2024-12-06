@@ -78,28 +78,38 @@ const emit = defineEmits<{
 const recordsPerPageOptions = [10, 20, 30, 40, 50]
 
 const totalPages = computed(() => Math.ceil(props.totalRecords / props.recordsPerPage))
-
 const listOfPages = computed(() => {
   const pageList: (number | string)[] = []
+  const currentPage = props.pageNumber
+  const total = totalPages.value
 
-  if (props.pageNumber > 3) pageList.push(1)
+  // Add the first page if currentPage is beyond 3
+  if (currentPage > 3) {
+    pageList.push(1)
+  }
 
-  if (props.pageNumber > 4) {
+  // Add leading ellipsis if needed
+  if (currentPage > 4) {
     pageList.push('...')
   }
 
-  const start = Math.max(1, props.pageNumber - 1)
-  const end = Math.min(totalPages.value, props.pageNumber + 1)
-  for (let page = start; page <= end; page++) {
+  // Calculate the range of pages to show around the current page
+  const rangeStart = Math.max(1, currentPage - 1)
+  const rangeEnd = Math.min(total, currentPage + 1)
+
+  // Add pages in the calculated range
+  for (let page = rangeStart; page <= rangeEnd; page++) {
     pageList.push(page)
   }
 
-  if (props.pageNumber < totalPages.value - 3) {
+  // Add trailing ellipsis if needed
+  if (currentPage < total - 3) {
     pageList.push('...')
   }
 
-  if (props.pageNumber < totalPages.value - 2) {
-    pageList.push(totalPages.value)
+  // Add the last page if currentPage is sufficiently far from the end
+  if (currentPage < total - 2) {
+    pageList.push(total)
   }
 
   return pageList
