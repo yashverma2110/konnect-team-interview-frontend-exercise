@@ -60,7 +60,7 @@ const buttonVariant = computed(() => {
 .button {
   border-radius: 0.25rem;
   color: vars.$white;
-  padding: 0.75rem 1rem;
+  padding: 0.5rem;
   border: none;
   cursor: pointer;
   width: fit-content;
