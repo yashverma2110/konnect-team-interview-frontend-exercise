@@ -194,8 +194,8 @@
                 class="service-details__versions-table-cell-item"
               >
                 <div class="service-details__versions-table-avatar-group">
-                <BaseAvatarGroup
-                  :avatars="developerAvatars"
+                  <BaseAvatarGroup
+                    :avatars="developerAvatars"
                   />
                 </div>
                 <div>
