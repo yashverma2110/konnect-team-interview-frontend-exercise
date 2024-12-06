@@ -132,6 +132,7 @@ function handleSelect(value: string | number, index: number) {
 
 .dropdown__options {
   position: absolute;
+  z-index: 100;
   left: 0;
   background: vars.$white;
   margin: 0;
