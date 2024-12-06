@@ -10,6 +10,8 @@
       >
         Service Hub
       </BaseTypography>
+
+      <!-- Action center -->
       <div class="service-catalog__header-actions">
         <div class="service-catalog__header-actions-sort-container">
           <BaseButton
@@ -112,6 +114,8 @@
         :icon="faSpinner"
       />
     </div>
+
+    <!-- Service list -->
     <ul
       v-else-if="servicesStore.servicesToDisplay.length > 0"
       class="catalog"
