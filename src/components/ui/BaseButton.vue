@@ -5,6 +5,7 @@
       buttonVariant,
       { 'button_outlined': props.type === 'outlined' },
       { 'button_rounded-full': props.rounded === 'full' },
+      { 'button_rounded-semi': props.rounded === 'semi' },
       { 'button_disabled': props.disabled },
     ]"
     :disabled="props.disabled"
@@ -20,7 +21,7 @@ import { computed } from 'vue'
 interface IBaseButtonProps {
   variant: 'primary' | 'secondary' | 'accent' | 'white' | 'transparent'
   type?: 'filled' | 'outlined'
-  rounded?: 'base' | 'full'
+  rounded?: 'base' | 'full' | 'semi'
   disabled?: boolean
 }
 
@@ -60,7 +61,7 @@ const buttonVariant = computed(() => {
 .button {
   border-radius: 0.25rem;
   color: vars.$white;
-  padding: 0.5rem;
+  padding: 0.5rem 1rem;
   border: none;
   cursor: pointer;
   min-width: 2rem;
@@ -75,6 +76,10 @@ const buttonVariant = computed(() => {
       border: 1px solid colors.$border-color;
       color: colors.$text-color-secondary;
     }
+  }
+
+  &.button_rounded-semi {
+    border-radius: 100px;
   }
 
   &.button_disabled {

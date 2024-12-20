@@ -67,7 +67,7 @@
         </BaseInput>
 
         <BaseButton
-          rounded="full"
+          rounded="semi"
           variant="primary"
           @click="router.push('/create-service')"
         >
